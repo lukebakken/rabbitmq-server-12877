@@ -1,0 +1,5 @@
+%% -- ERLANG INET CONFIGURATION FILE --
+%% add hosts
+{host, {127,0,0,1}, ["rmq0.local"]}.
+{host, {127,0,0,1}, ["rmq1.local"]}.
+{host, {127,0,0,1}, ["rmq2.local"]}.
