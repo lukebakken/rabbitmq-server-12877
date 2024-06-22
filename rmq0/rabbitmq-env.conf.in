@@ -1,0 +1,17 @@
+#!/bin/sh
+LOG=debug
+USE_LONGNAME=true
+NODENAME="rabbit0@rmq0.local"
+NODE_PORT=5672
+
+readonly erl_ssl_path_file='/tmp/erl_ssl_path'
+
+if [ ! -f "$erl_ssl_path_file" ]
+then
+    erl -noinput -eval 'io:format("'"ERL_SSL_PATH='~s'"'", [filename:dirname(code:which(inet_tls_dist))])' -s init stop > "$erl_ssl_path_file"
+fi
+
+eval "$(cat "$erl_ssl_path_file")"
+
+SERVER_ADDITIONAL_ERL_ARGS="-pa $ERL_SSL_PATH -proto_dist inet_tls -ssl_dist_optfile ##RMQ0_DIR##/inter_node_tls.config"
+CTL_ERL_ARGS="-pa $ERL_SSL_PATH -proto_dist inet_tls -ssl_dist_optfile ##RMQ0_DIR##/inter_node_tls.config"

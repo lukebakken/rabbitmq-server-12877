@@ -1,0 +1,28 @@
+cluster_partition_handling = pause_minority
+
+loopback_users = none
+
+log.console = true
+log.console.level = debug
+log.file.level = info
+log.exchange = false
+log.exchange.level = info
+
+cluster_formation.peer_discovery_backend = classic_config
+cluster_formation.classic_config.nodes.0 = rabbit0@rmq0.local
+cluster_formation.classic_config.nodes.1 = rabbit1@rmq1.local
+cluster_formation.classic_config.nodes.2 = rabbit2@rmq2.local
+
+listeners.tcp.default = 5673
+listeners.ssl.default = 5773
+
+management.tcp.port = 15673
+management.ssl.port = 15773
+
+management.ssl.certfile   = ##RMQ1_DIR##/server_rmq1.local_certificate.pem
+management.ssl.keyfile    = ##RMQ1_DIR##/server_rmq1.local_key.pem
+management.ssl.cacertfile = ##RMQ1_DIR##/ca_certificate.pem
+
+ssl_options.certfile   = ##RMQ1_DIR##/server_rmq1.local_certificate.pem
+ssl_options.keyfile    = ##RMQ1_DIR##/server_rmq1.local_key.pem
+ssl_options.cacertfile = ##RMQ1_DIR##/ca_certificate.pem
