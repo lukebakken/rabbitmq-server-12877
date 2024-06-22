@@ -1,3 +1,10 @@
+## Setup
+
+```
+git submodule update --init
+make -C rabbitmq-server
+```
+
 ## Bring up a cluster
 
 * Open three terminals in this directory
