@@ -1,11 +1,6 @@
 ## Bring up a cluster
 
-```
-make up
-```
-
-## Clean data:
-
-```
-make clean
-```
+* Open three terminals in this directory
+* In one terminal, run `make start-rmq0`
+* In another terminal, run `make start-rmq1`
+* In the last terminal, run `make start-rmq2`
