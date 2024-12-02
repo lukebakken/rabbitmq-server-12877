@@ -1,0 +1,15 @@
+[
+    {server, [
+        {cacertfile, "##RMQ2_DIR##/ca_certificate.pem"},
+        {certfile,   "##RMQ2_DIR##/client_rmq2.local_certificate.pem"},
+        {keyfile,    "##RMQ2_DIR##/client_rmq2.local_key.pem"},
+        {verify, verify_peer},
+        {fail_if_no_peer_cert, true}
+    ]},
+    {client, [
+        {cacertfile, "##RMQ2_DIR##/ca_certificate.pem"},
+        {certfile,   "##RMQ2_DIR##/client_rmq2.local_certificate.pem"},
+        {keyfile,    "##RMQ2_DIR##/client_rmq2.local_key.pem"},
+        {verify, verify_peer}
+    ]}
+].

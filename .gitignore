@@ -1,0 +1,7 @@
+data/
+tmp/
+log*/
+
+rabbitmq.conf
+rabbitmq-env.conf
+inter_node_tls.config
