@@ -1,22 +1,37 @@
-.PHONY: clean start-rmq0 start-rmq1 start-rmq2
+.PHONY: clean start-rmq0 start-rmq1 start-rmq2 join-rmq1 join-rmq2 form-cluster status
 
 start-rmq0:
 	sed -e "s|##RMQ0_DIR##|$(CURDIR)/rmq0|g" $(CURDIR)/rmq0/rabbitmq.conf.in > $(CURDIR)/rmq0/rabbitmq.conf
 	sed -e "s|##RMQ0_DIR##|$(CURDIR)/rmq0|g" $(CURDIR)/rmq0/rabbitmq-env.conf.in > $(CURDIR)/rmq0/rabbitmq-env.conf
 	sed -e "s|##RMQ0_DIR##|$(CURDIR)/rmq0|g" $(CURDIR)/rmq0/inter_node_tls.config.in > $(CURDIR)/rmq0/inter_node_tls.config
-	make ERL_INETRC=$(CURDIR)/erl_inetrc LOG=debug USE_LONGNAME='true' RABBITMQ_NODENAME='rabbit0@rmq0.local' RABBITMQ_NODE_PORT=5672 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq0/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq0/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
+	make RABBITMQ_NODENAME=rabbit0@rmq0.local RABBITMQ_NODE_PORT=5672 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq0/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq0/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
 
 start-rmq1:
 	sed -e "s|##RMQ1_DIR##|$(CURDIR)/rmq1|g" $(CURDIR)/rmq1/rabbitmq.conf.in > $(CURDIR)/rmq1/rabbitmq.conf
 	sed -e "s|##RMQ1_DIR##|$(CURDIR)/rmq1|g" $(CURDIR)/rmq1/rabbitmq-env.conf.in > $(CURDIR)/rmq1/rabbitmq-env.conf
 	sed -e "s|##RMQ1_DIR##|$(CURDIR)/rmq1|g" $(CURDIR)/rmq1/inter_node_tls.config.in > $(CURDIR)/rmq1/inter_node_tls.config
-	make ERL_INETRC=$(CURDIR)/erl_inetrc LOG=debug USE_LONGNAME='true' RABBITMQ_NODENAME='rabbit1@rmq1.local' RABBITMQ_NODE_PORT=5673 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq1/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq1/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
+	make RABBITMQ_NODENAME=rabbit1@rmq1.local RABBITMQ_NODE_PORT=5673 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq1/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq1/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
 
 start-rmq2:
 	sed -e "s|##RMQ2_DIR##|$(CURDIR)/rmq2|g" $(CURDIR)/rmq2/rabbitmq.conf.in > $(CURDIR)/rmq2/rabbitmq.conf
 	sed -e "s|##RMQ2_DIR##|$(CURDIR)/rmq2|g" $(CURDIR)/rmq2/rabbitmq-env.conf.in > $(CURDIR)/rmq2/rabbitmq-env.conf
 	sed -e "s|##RMQ2_DIR##|$(CURDIR)/rmq2|g" $(CURDIR)/rmq2/inter_node_tls.config.in > $(CURDIR)/rmq2/inter_node_tls.config
-	make ERL_INETRC=$(CURDIR)/erl_inetrc LOG=debug USE_LONGNAME='true' RABBITMQ_NODENAME='rabbit2@rmq2.local' RABBITMQ_NODE_PORT=5674 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq2/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq2/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
+	make RABBITMQ_NODENAME=rabbit2@rmq2.local RABBITMQ_NODE_PORT=5674 RABBITMQ_ENABLED_PLUGINS='rabbitmq_management,rabbitmq_top' RABBITMQ_CONFIG_FILE="$(CURDIR)/rmq2/rabbitmq.conf" RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq2/rabbitmq-env.conf" -C $(CURDIR)/rabbitmq-server run-broker
+
+join-rmq1:
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq1/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl stop_app
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq1/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl join_cluster rabbit0@rmq0.local
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq1/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl start_app
+
+join-rmq2:
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq2/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl stop_app
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq2/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl join_cluster rabbit0@rmq0.local
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq2/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl start_app
+
+form-cluster: join-rmq1 join-rmq2
+
+status:
+	RABBITMQ_CONF_ENV_FILE="$(CURDIR)/rmq0/rabbitmq-env.conf" $(CURDIR)/rabbitmq-server/sbin/rabbitmqctl cluster_status
 
 clean:
 	git clean -xffd
